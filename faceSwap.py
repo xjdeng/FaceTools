@@ -125,6 +125,18 @@ def warpTriangle(img1, img2, t1, t2) :
     img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] = img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] + img2Rect 
     
 def getpoints(imfile, predictor):
+    """
+NEW Function: take an file with a face (imfile) and predictor object and returns
+a list of tuples containing coordinates of the boundaries on the face.
+
+If you don't have a predictor, then create one:
+    
+import dlib
+predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+
+Note that you can download shape_predictor_68_face_landmarks.dat from a lot of
+places; just Google for one.
+    """
     img_ref = cv2.imread(imfile)
     gray1 = cv2.cvtColor(img_ref, cv2.COLOR_BGR2GRAY)
     detector = dlib.get_frontal_face_detector()
