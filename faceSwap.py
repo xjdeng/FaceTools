@@ -5,6 +5,10 @@ import numpy as np
 import cv2
 import dlib
 from imutils import face_utils
+import face_recognition_models as frm
+import Easy_Facial_Recognition as efr
+
+predictor = dlib.shape_predictor(frm.pose_predictor_model_location())
 
 # Read points from text file
 def readPoints(path) :
@@ -124,7 +128,7 @@ def warpTriangle(img1, img2, t1, t2) :
      
     img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] = img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] + img2Rect 
     
-def getpoints(imfile, predictor = None):
+def getpoints(face, predictor = None):
     """
 NEW Function: take an file with a face (imfile) and predictor object and returns
 a list of tuples containing coordinates of the boundaries on the face.
@@ -137,14 +141,10 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 Note that you can download shape_predictor_68_face_landmarks.dat from a lot of
 places; just Google for one.
     """
-    if predictor is None:
-        import landmarks
-        predictor = landmarks.run()
-    img_ref = cv2.imread(imfile)
-    gray1 = cv2.cvtColor(img_ref, cv2.COLOR_BGR2GRAY)
-    detector = dlib.get_frontal_face_detector()
-    rects1 = detector(gray1, 0)
-    shape1 = predictor(gray1, rects1[0])
+    if isinstance(face, efr.EasyImage) == False:
+        raise(efr.NotAFace)
+    gray1 = cv2.cvtColor(face.parent_image.getimg(), cv2.COLOR_BGR2GRAY)
+    shape1 = predictor(gray1, face.face)
     points1 = face_utils.shape_to_np(shape1)
     return list(map(tuple, points1))
 
