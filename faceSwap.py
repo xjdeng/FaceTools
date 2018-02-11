@@ -8,7 +8,7 @@ from imutils import face_utils
 import face_recognition_models as frm
 import Easy_Facial_Recognition as efr
 
-predictor = dlib.shape_predictor(frm.pose_predictor_model_location())
+default_predictor = dlib.shape_predictor(frm.pose_predictor_model_location())
 
 # Read points from text file
 def readPoints(path) :
@@ -142,22 +142,28 @@ Note that you can download shape_predictor_68_face_landmarks.dat from a lot of
 places; just Google for one.
     """
     if isinstance(face, efr.EasyImage) == False:
-        raise(efr.NotAFace)
+        raise(efr.NotFace)
+    if predictor is None:
+        predictor = default_predictor
     gray1 = cv2.cvtColor(face.parent_image.getimg(), cv2.COLOR_BGR2GRAY)
     shape1 = predictor(gray1, face.face)
     points1 = face_utils.shape_to_np(shape1)
     return list(map(tuple, points1))
 
-def swap(filename1, filename2, predictor = None):
-    img1 = cv2.imread(filename1);
-    img2 = cv2.imread(filename2);
-    img1Warped = np.copy(img2);    
+def swap(input1, input2, predictor = None, detector = None):
+    i1 = efr.load_image(input1)
+    i2 = efr.load_image(input2)
+    img1 = i1.getimg()
+    img2 = i2.getimg()
+    img1Warped = np.copy(img2);
+    face1 = i1.detect_faces()[0]
+    face2 = i2.detect_faces()[0]
     
     # Read array of corresponding points
     # points1 = readPoints(filename1 + '.txt')
     # points2 = readPoints(filename2 + '.txt')
-    points1 = getpoints(filename1, predictor)
-    points2 = getpoints(filename2, predictor)
+    points1 = getpoints(face1, predictor)
+    points2 = getpoints(face2, predictor)
     
     # Find convex hull
     hull1 = []
