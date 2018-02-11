@@ -150,14 +150,14 @@ places; just Google for one.
     points1 = face_utils.shape_to_np(shape1)
     return list(map(tuple, points1))
 
-def swap(input1, input2, predictor = None, detector = None):
-    i1 = efr.load_image(input1)
-    i2 = efr.load_image(input2)
+def swap(face, body, facenum = 0, bodynum = 0, predictor = None, detector = None):
+    i1 = efr.load_image(face)
+    i2 = efr.load_image(body)
     img1 = i1.getimg()
     img2 = i2.getimg()
     img1Warped = np.copy(img2);
-    face1 = i1.detect_faces()[0]
-    face2 = i2.detect_faces()[0]
+    face1 = i1.detect_faces()[facenum]
+    face2 = i2.detect_faces()[bodynum]
     
     # Read array of corresponding points
     # points1 = readPoints(filename1 + '.txt')
@@ -170,6 +170,7 @@ def swap(input1, input2, predictor = None, detector = None):
     hull2 = []
 
     hullIndex = cv2.convexHull(np.array(points2), returnPoints = False)
+    #hullIndex = cv2.convexHull(np.array(points1), returnPoints = False)
           
     for i in range(0, len(hullIndex)):
         hull1.append(points1[int(hullIndex[i])])
