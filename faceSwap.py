@@ -162,8 +162,10 @@ def swap(face, body, facenum = 0, bodynum = 0, predictor = None, detector = None
     # Read array of corresponding points
     # points1 = readPoints(filename1 + '.txt')
     # points2 = readPoints(filename2 + '.txt')
-    points1 = getpoints(face1, predictor)
-    points2 = getpoints(face2, predictor)
+    #points1 = getpoints(face1, predictor)
+    #points2 = getpoints(face2, predictor)
+    points1 = face1.getpoints(predictor)
+    points2 = face2.getpoints(predictor)
     
     # Find convex hull
     hull1 = []
