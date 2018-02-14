@@ -8,6 +8,7 @@ import os
 import cv2
 import numpy as np
 import math
+import random
 import Easy_Facial_Recognition as efr
 
 # Read points from text files in directory
@@ -186,11 +187,40 @@ def warpTriangle(img1, img2, t1, t2) :
      
     img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] = img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] + img2Rect
 
+def weighted_avg_dir(face_dir, dims = "", weights = None, resolution = 10):
+    face_list = efr.faces_in_dir(face_dir)
+    return weighted_avg(face_list, dims, weights, resolution)
+
+def weighted_avg(face_list, dims = "", weights = None, resolution = 10):  
+    """
+Like average() but with a bias vector included in the weights variable as a 
+list of integers which generates a random average face.  If no weights are 
+specified, then a random weight vector will be generated using integers 
+between 0 and resolution
+    """
+    if weights is None:
+        weights = [random.randint(0,resolution) for f in face_list]
+    if len(weights) < len(face_list):
+        e = Exception("Not enough weights specified for your list of faces.")
+        raise(e)
+    new_face_list = []
+    for i in range(0, len(weights)):
+        new_face_list += int(round(weights[i]))*[face_list[i]]
+    return average(new_face_list, dims)
+    
+    
+    
 def average_dir(face_dir, dims = ""):
+    """
+Gets the average of all faces in directory face_dir
+    """
     face_list = efr.faces_in_dir(face_dir)
     return average(face_list, dims)
 
 def average(face_list, dims = ""):
+    """
+Gets the average of all faces in a face_list consisting of EasyFace objects.
+    """
     if isinstance(dims, tuple):
         h = dims[0]
         w = dims[1]
