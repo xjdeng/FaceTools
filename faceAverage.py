@@ -187,6 +187,10 @@ def warpTriangle(img1, img2, t1, t2) :
      
     img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] = img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] + img2Rect
 
+def average_dir(face_dir, dims = ""):
+    face_list = efr.faces_in_dir(face_dir)
+    return average(face_list, dims)
+
 def average(face_list, dims = ""):
     if isinstance(dims, tuple):
         h = dims[0]
