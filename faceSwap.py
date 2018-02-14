@@ -128,28 +128,6 @@ def warpTriangle(img1, img2, t1, t2) :
      
     img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] = img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] + img2Rect 
     
-def getpoints(face, predictor = None):
-    """
-NEW Function: take an file with a face (imfile) and predictor object and returns
-a list of tuples containing coordinates of the boundaries on the face.
-
-If you don't have a predictor, then create one:
-    
-import dlib
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-
-Note that you can download shape_predictor_68_face_landmarks.dat from a lot of
-places; just Google for one.
-    """
-    if isinstance(face, efr.EasyImage) == False:
-        raise(efr.NotFace)
-    if predictor is None:
-        predictor = default_predictor
-    gray1 = cv2.cvtColor(face.parent_image.getimg(), cv2.COLOR_BGR2GRAY)
-    shape1 = predictor(gray1, face.face)
-    points1 = face_utils.shape_to_np(shape1)
-    return list(map(tuple, points1))
-
 def swap(face, body, facenum = 0, bodynum = 0, predictor = None, detector = None):
     i1 = efr.load_image(face)
     i2 = efr.load_image(body)
@@ -233,65 +211,8 @@ if __name__ == '__main__' :
     filename1 = 'ted_cruz.jpg'
     filename2 = 'donald_trump.jpg'
     
-    img1 = cv2.imread(filename1);
-    img2 = cv2.imread(filename2);
-    img1Warped = np.copy(img2);    
+    output = swap(filename1, filename2)
     
-    # Read array of corresponding points
-    # points1 = readPoints(filename1 + '.txt')
-    # points2 = readPoints(filename2 + '.txt')
-    points1 = getpoints(filename1)
-    points2 = getpoints(filename2)
-    
-    # Find convex hull
-    hull1 = []
-    hull2 = []
-
-    hullIndex = cv2.convexHull(np.array(points2), returnPoints = False)
-          
-    for i in range(0, len(hullIndex)):
-        hull1.append(points1[int(hullIndex[i])])
-        hull2.append(points2[int(hullIndex[i])])
-    
-    
-    # Find delanauy traingulation for convex hull points
-    sizeImg2 = img2.shape    
-    rect = (0, 0, sizeImg2[1], sizeImg2[0])
-     
-    dt = calculateDelaunayTriangles(rect, hull2)
-    
-    if len(dt) == 0:
-        quit()
-    
-    # Apply affine transformation to Delaunay triangles
-    for i in range(0, len(dt)):
-        t1 = []
-        t2 = []
-        
-        #get points for img1, img2 corresponding to the triangles
-        for j in range(0, 3):
-            t1.append(hull1[dt[i][j]])
-            t2.append(hull2[dt[i][j]])
-        
-        warpTriangle(img1, img1Warped, t1, t2)
-    
-            
-    # Calculate Mask
-    hull8U = []
-    for i in range(0, len(hull2)):
-        hull8U.append((hull2[i][0], hull2[i][1]))
-    
-    mask = np.zeros(img2.shape, dtype = img2.dtype)  
-    
-    cv2.fillConvexPoly(mask, np.int32(hull8U), (255, 255, 255))
-    
-    r = cv2.boundingRect(np.float32([hull2]))    
-    
-    center = ((r[0]+int(r[2]/2), r[1]+int(r[3]/2)))
-        
-    
-    # Clone seamlessly.
-    output = cv2.seamlessClone(np.uint8(img1Warped), img2, mask, center, cv2.NORMAL_CLONE)
     
     cv2.imshow("Face Swapped", output)
     cv2.waitKey(0)
