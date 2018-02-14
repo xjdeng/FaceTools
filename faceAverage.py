@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 import math
 import sys
+import Easy_Facial_Recognition as efr
 
 # Read points from text files in directory
 def readPoints(path) :
@@ -186,7 +187,110 @@ def warpTriangle(img1, img2, t1, t2) :
      
     img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] = img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] + img2Rect
 
+def average(face_list, dims = ""):
+    if isinstance(dims, tuple):
+        h = dims[0]
+        w = dims[1]
+    else:
+        face_rects = [y.face for y in face_list]
+        widths = [x.right() - x.left() for x in face_rects]
+        heights = [x.bottom() - x.top() for x in face_rects]
+        if dims.lower() == "max":
+            w = max(widths)
+            h = max(heights)
+        elif dims.lower() == "min":
+            w = min(widths)
+            h = min(heights)
+        else: #Use the average widths and heights of faces in face_list
+            w = int(round(np.mean(widths)))
+            h = int(round(np.mean(heights)))
+    allPoints = [f.getpoints() for f in face_list]
+    #Get floating point image data:
+    images = [np.float32(f.parent_image.getimg())/255.0 for f in face_list]
+    # Eye corners
+    eyecornerDst = [ (np.int(0.3 * w ), np.int(h / 3)), (np.int(0.7 * w ), np.int(h / 3)) ]
+    
+    imagesNorm = []
+    pointsNorm = []
+    # Add boundary points for delaunay triangulation
+    boundaryPts = np.array([(0,0), (w/2,0), (w-1,0), (w-1,h/2), ( w-1, h-1 ), ( w/2, h-1 ), (0, h-1), (0,h/2) ]);
+    # Initialize location of average points to 0s
+    pointsAvg = np.array([(0,0)]* ( len(allPoints[0]) + len(boundaryPts) ), np.float32());
+    
+    numImages = len(images)
+    
+    # Warp images and trasnform landmarks to output coordinate system,
+    # and find average of transformed landmarks.
+    
+    for i in range(0, numImages):
 
+        points1 = allPoints[i];
+
+        # Corners of the eye in input image
+        eyecornerSrc  = [ allPoints[i][36], allPoints[i][45] ] ;
+        
+        # Compute similarity transform
+        tform = similarityTransform(eyecornerSrc, eyecornerDst);
+        
+        # Apply similarity transformation
+        img = cv2.warpAffine(images[i], tform, (w,h));
+
+        # Apply similarity transform on points
+        points2 = np.reshape(np.array(points1), (68,1,2));        
+        
+        points = cv2.transform(points2, tform);
+        
+        points = np.float32(np.reshape(points, (68, 2)));
+        
+        # Append boundary points. Will be used in Delaunay Triangulation
+        points = np.append(points, boundaryPts, axis=0)
+        
+        # Calculate location of average landmark points.
+        pointsAvg = pointsAvg + points / numImages;
+        
+        pointsNorm.append(points);
+        imagesNorm.append(img);
+    
+
+    
+    # Delaunay triangulation
+    rect = (0, 0, w, h);
+    dt = calculateDelaunayTriangles(rect, np.array(pointsAvg));
+
+    # Output image
+    output = np.zeros((h,w,3), np.float32());
+
+    # Warp input images to average image landmarks
+    for i in range(0, len(imagesNorm)) :
+        img = np.zeros((h,w,3), np.float32());
+        # Transform triangles one by one
+        for j in range(0, len(dt)) :
+            tin = []; 
+            tout = [];
+            
+            for k in range(0, 3) :                
+                pIn = pointsNorm[i][dt[j][k]];
+                pIn = constrainPoint(pIn, w, h);
+                
+                pOut = pointsAvg[dt[j][k]];
+                pOut = constrainPoint(pOut, w, h);
+                
+                tin.append(pIn);
+                tout.append(pOut);
+            
+            
+            warpTriangle(imagesNorm[i], img, tin, tout);
+
+
+        # Add image intensities for averaging
+        output = output + img;
+
+
+    # Divide by numImages to get average
+    output = output / numImages;
+    return output    
+    
+    
 
 if __name__ == '__main__' :
     
@@ -214,7 +318,7 @@ if __name__ == '__main__' :
     # Initialize location of average points to 0s
     pointsAvg = np.array([(0,0)]* ( len(allPoints[0]) + len(boundaryPts) ), np.float32());
     
-    n = len(allPoints[0]);
+    #n = len(allPoints[0]);
 
     numImages = len(images)
     
