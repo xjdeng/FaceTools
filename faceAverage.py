@@ -321,7 +321,7 @@ Gets the average of all faces in a face_list consisting of EasyFace objects.
 
     # Divide by numImages to get average
     output = output / numImages;
-    return output    
+    return efr.EasyImage(output)    
     
     
 
@@ -336,5 +336,5 @@ if __name__ == '__main__' :
     output = average_dir(path, (h,w))
 
     # Display result
-    cv2.imshow('image', output);
+    cv2.imshow('image', output.getimg()/255.0);
     cv2.waitKey(0);
