@@ -7,6 +7,7 @@
 import os
 import cv2
 import numpy as np
+from path import Path as path
 import math
 import random
 import Easy_Facial_Recognition as efr
@@ -187,6 +188,24 @@ def warpTriangle(img1, img2, t1, t2) :
      
     img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] = img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] + img2Rect
 
+def random_avg_dir(face_dir, dims = "", n = 3):
+    results = []
+    p = path(face_dir)
+    files = p.files()
+    order = random.sample(files, len(files))
+    i = 0
+    while (i < len(files)) & (len(results) < n):
+        try:
+            img = efr.EasyImageFile(order[i])
+            faces = img.detect_faces()
+            results += faces
+        except efr.NotAnImage:
+            pass
+        i += 1
+    return average(results[0:min(n, len(results))], dims)
+    
+
+
 def weighted_avg_dir(face_dir, dims = "", weights = None, resolution = 10):
     face_list = efr.faces_in_dir(face_dir)
     return weighted_avg(face_list, dims, weights, resolution)
@@ -221,6 +240,8 @@ def average(face_list, dims = ""):
     """
 Gets the average of all faces in a face_list consisting of EasyFace objects.
     """
+    if len(face_list) == 0:
+        return None
     if isinstance(dims, tuple):
         h = dims[0]
         w = dims[1]
