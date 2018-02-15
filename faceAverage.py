@@ -188,7 +188,7 @@ def warpTriangle(img1, img2, t1, t2) :
      
     img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] = img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] + img2Rect
 
-def random_avg_dir(face_dir, dims = "", n = 3):
+def random_avg_dir(face_dir, dims = "", n = 20):
     results = []
     p = path(face_dir)
     files = p.files()
