@@ -190,6 +190,9 @@ def warpTriangle(img1, img2, t1, t2) :
     img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] = img2[r2[1]:r2[1]+r2[3], r2[0]:r2[0]+r2[2]] + img2Rect
 
 def random_avg_dir(face_dir, dims = "", n = 20):
+    """
+Get the average of n faces found under in face_dir
+    """
     results = []
     p = path(face_dir)
     files = p.files()
@@ -206,6 +209,11 @@ def random_avg_dir(face_dir, dims = "", n = 20):
     return average(results[0:min(n, len(results))], dims)
 
 def random_avg_subdir(myinput, dims = "", n = 20):
+    """
+Get the average of n faces chosen from different subdirectories of myinput. 
+You can also pass a list of directories into myinput instead of a string
+representing the target directory
+    """
     results = []
     if isinstance(myinput, list) == False:
         subdirs = dirtools.all_subdirs(myinput)
