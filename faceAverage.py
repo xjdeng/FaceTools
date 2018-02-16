@@ -10,6 +10,7 @@ import numpy as np
 from path import Path as path
 import math
 import random
+import dirtools
 import Easy_Facial_Recognition as efr
 
 # Read points from text files in directory
@@ -203,6 +204,32 @@ def random_avg_dir(face_dir, dims = "", n = 20):
             pass
         i += 1
     return average(results[0:min(n, len(results))], dims)
+
+def random_avg_subdir(myinput, dims = "", n = 20):
+    results = []
+    if isinstance(myinput, list) == False:
+        subdirs = dirtools.all_subdirs(myinput)
+    else:
+        subdirs = myinput
+    order = random.sample(subdirs, len(subdirs))
+    i = 0
+    while (i < len(order)) & (len(results) < n):
+        d = path(order[i])
+        files = d.files()
+        j = 0
+        goahead = False
+        order2 = random.sample(files, len(files))
+        while (j < len(files)) & (len(results) < n) & (goahead == False):
+            try:
+                img = efr.EasyImageFile(order2[j])
+                faces = img.detect_faces()
+                results += faces
+            except efr.NotAnImage:
+                pass
+            j += 1
+        i += 1
+    return average(results[0:min(n, len(results))], dims)
+            
     
 
 
@@ -348,13 +375,13 @@ Gets the average of all faces in a face_list consisting of EasyFace objects.
 
 if __name__ == '__main__' :
     
-    path = 'presidents/'
+    Path = 'presidents/'
     
     # Dimensions of output image
     w = 600;
     h = 600;
 
-    output = average_dir(path, (h,w))
+    output = average_dir(Path, (h,w))
 
     # Display result
     cv2.imshow('image', output.getimg()/255.0);
