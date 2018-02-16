@@ -4,9 +4,10 @@ import sys
 import numpy as np
 import cv2
 import dlib
-from imutils import face_utils
 import face_recognition_models as frm
 import Easy_Facial_Recognition as efr
+import random
+from path import Path as path
 
 default_predictor = dlib.shape_predictor(frm.pose_predictor_model_location())
 
@@ -180,7 +181,7 @@ Note: face and body need to be EasyImage objects!
         for j in range(0, 3):
             t1.append(hull1[dt[i][j]])
             t2.append(hull2[dt[i][j]])
-        
+               
         warpTriangle(img1, img1Warped, t1, t2)
     
             
@@ -202,6 +203,19 @@ Note: face and body need to be EasyImage objects!
     output = cv2.seamlessClone(np.uint8(img1Warped), img2, mask, center, cv2.NORMAL_CLONE)
     body._img = output
     return body
+
+def mass_swap(facedir, bodydir, tgtdir, predictor = None, detector = None):
+    newfaces = efr.faces_in_dir(facedir)
+    b = path(bodydir)
+    for f in b.files():
+        try:
+            img = efr.EasyImageFile(f)
+            faces = img.detect_faces()
+            for i in range(0, len(faces)):
+                swap_inplace(random.choice(newfaces).parent_image, img, 0, i, predictor, detector)
+            img.save(tgtdir + "/" + str(random.randint(1,1000000000)) + ".jpg")
+        except efr.NotAnImage:
+            pass
 
 if __name__ == '__main__' :
     
