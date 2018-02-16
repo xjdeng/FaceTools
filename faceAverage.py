@@ -232,6 +232,7 @@ representing the target directory
                 img = efr.EasyImageFile(order2[j])
                 faces = img.detect_faces()
                 results += faces
+                goahead = True
             except efr.NotAnImage:
                 pass
             j += 1
