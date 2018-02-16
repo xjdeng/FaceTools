@@ -238,7 +238,15 @@ representing the target directory
         i += 1
     return average(results[0:min(n, len(results))], dims)
             
-    
+def generate_random_avg(myinput, outputdir, generator = random_avg_subdir, \
+                        images = 20, dims = "", faces = 20):
+    """
+Generates a number of random faces. The var images specifies the # to generate.
+The var faces indicates the # of faces to use per random image.
+    """
+    for i in range(0, images):
+        newface = generator(myinput, dims, faces)
+        newface.save(outputdir + "/" + str(random.randint(1,1000000000)) + ".jpg")
 
 
 def weighted_avg_dir(face_dir, dims = "", weights = None, resolution = 10):
