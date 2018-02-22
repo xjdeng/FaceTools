@@ -249,6 +249,9 @@ The var faces indicates the # of faces to use per random image.
         newface = generator(myinput, dims, faces)
         newface.save(outputdir + "/" + str(random.randint(1,1000000000)) + ".jpg")
 
+def generate_random_folder(myinput, outputdir, images = 20, dims = "", faces = 20):
+    generate_random_avg(myinput, outputdir, random_avg_dir, images, dims, faces)
+
 
 def weighted_avg_dir(face_dir, dims = "", weights = None, resolution = 10):
     face_list = efr.faces_in_dir(face_dir)
