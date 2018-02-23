@@ -1,0 +1,5 @@
+Use getpoints in __main__
+
+Create independent function for swapping faces
+
+If multiple faces are found, then swap faces at random

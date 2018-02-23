@@ -97,3 +97,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+=======
+*.pyc
+__pycache__/faceSwap.cpython-36.pyc
