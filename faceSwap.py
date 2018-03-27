@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 import dlib
 import face_recognition_models as frm
-import Easy_Facial_Recognition as efr
+import Easy_Image as efr
 import random
 from path import Path as path
 

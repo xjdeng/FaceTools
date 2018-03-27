@@ -11,7 +11,7 @@ from path import Path as path
 import math
 import random
 import dirtools
-import Easy_Facial_Recognition as efr
+import Easy_Image as efr
 
 # Read points from text files in directory
 def readPoints(path) :
