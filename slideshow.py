@@ -4,6 +4,7 @@ from Easy_Image import gui
 
 import random
 import faceSwap as fs
+import faceAverage as fa
 
 def faceswap_helper(img, face_img_list):
     img_faces = img.detect_faces()
@@ -25,3 +26,9 @@ def faceswap_helper(img, face_img_list):
 
 def faceswap(img_list, face_img_list, delay = 1):
     gui.slideshow(img_list, delay, faceswap_helper, face_img_list)
+    
+def faceswap_avg(img_list, avg_face_list, delay = 1):
+    faces = []
+    for img in avg_face_list:
+        faces += img.detect_faces()
+    faceswap(img_list, [fa.average(faces)], delay)
